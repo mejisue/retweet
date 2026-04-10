@@ -1,5 +1,14 @@
-export default function PostDetailPage() {
-    return <div className="flex flex-col gap-5">
+import PostItem from '@/components/post/post-item';
+import { Navigate, useParams } from 'react-router-dom';
 
-    </div>
+export default function PostDetailPage() {
+    const { postId } = useParams();
+
+    if (!postId) return <Navigate to="/" />;
+
+    return (
+        <div className="flex flex-col gap-5">
+            <PostItem postId={Number(postId)} type="DETAIL" />
+        </div>
+    );
 }
