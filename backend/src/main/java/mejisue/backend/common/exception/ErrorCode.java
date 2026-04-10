@@ -20,7 +20,11 @@ public enum ErrorCode {
     PASSWORD_RESET_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "만료된 비밀번호 재설정 링크입니다."),
 
     // Member
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다.");
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
+
+    // Post
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "권한이 없습니다.");
 
     private final HttpStatus status;
     private final String message;
