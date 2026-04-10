@@ -1,11 +1,10 @@
-import './App.css'
-import RootRoute from './root-route'
+import SessionProvider from './provider/session-provider';
+import RootRoute from './root-route';
 
-function App() {
-
-  return (
-    <RootRoute />
-  )
+export default function App() {
+    return (
+        <SessionProvider>
+            <RootRoute />
+        </SessionProvider>
+    );
 }
-
-export default App
