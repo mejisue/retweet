@@ -83,7 +83,7 @@ public class PostService {
 
     private Profile getProfile(Long memberId) {
         return profileRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PROFILE_NOT_FOUND));
     }
 
     private Post getOwnedPost(Long postId, Long memberId) {
