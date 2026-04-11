@@ -8,4 +8,9 @@ export const QUERY_KEYS = {
     comment: {
         post: (postId: number) => ['comment', 'post', postId],
     },
+    profile: {
+        all: ['profile'],
+        me: (memberId: number) => ['profile', 'me', memberId],
+        byId: (userId: number) => ['profile', 'byId', userId],
+    },
 } as const;
