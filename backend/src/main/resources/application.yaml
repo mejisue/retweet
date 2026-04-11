@@ -47,3 +47,14 @@ app:
     from: ${MAIL_FROM}
   cookie:
     secure: ${COOKIE_SECURE:false}
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY:test-access-key}
+      secret-key: ${AWS_SECRET_KEY:test-secret-key}
+    region: ${AWS_REGION:ap-northeast-2}
+    s3:
+      bucket: ${AWS_S3_BUCKET:test-bucket}
+    cloudfront:
+      domain: ${AWS_CLOUDFRONT_DOMAIN:test.cloudfront.net}
