@@ -38,7 +38,9 @@ export default function PostItem({ postId, type }: Props) {
                         />
                     </Link>
                     <div>
-                        <div className="font-bold">{post.author.nickname}</div>
+                        <Link to={`/profile/${post.author.memberId}`} className="font-bold hover:underline">
+                            {post.author.nickname}
+                        </Link>
                         <div className="text-muted-foreground text-sm">{formatTimeAgo(post.createdAt)}</div>
                     </div>
                 </div>
