@@ -11,6 +11,14 @@ vi.mock('@/components/post/post-item', () => ({
     ),
 }));
 
+vi.mock('@/components/comment/comment-editor', () => ({
+    default: () => <div data-testid="comment-editor" />,
+}));
+
+vi.mock('@/components/comment/comment-list', () => ({
+    default: () => <div data-testid="comment-list" />,
+}));
+
 const renderPage = (postId = '1') =>
     render(
         <MemoryRouter initialEntries={[`/post/${postId}`]}>
