@@ -13,6 +13,7 @@ import mejisue.backend.domain.post.entity.Post;
 import mejisue.backend.domain.post.repository.PostRepository;
 import mejisue.backend.domain.profile.entity.Profile;
 import mejisue.backend.domain.profile.repository.ProfileRepository;
+import mejisue.backend.infra.s3.S3Service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final ProfileRepository profileRepository;
     private final PostLikeRepository postLikeRepository;
+    private final S3Service s3Service;
 
     public PostResponse create(Member member, PostCreateRequest request) {
         Post post = postRepository.save(Post.create(member, request.content(), request.imageUrls()));
@@ -61,6 +63,9 @@ public class PostService {
 
     public void delete(Long postId, Member member) {
         Post post = getOwnedPost(postId, member.getId());
+        if (!post.getImageUrls().isEmpty()) {
+            s3Service.deleteAll(post.getImageUrls());
+        }
         postRepository.delete(post);
     }
 

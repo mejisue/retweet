@@ -5,9 +5,10 @@ import { PencilIcon } from 'lucide-react';
 type Props = {
     postId: number;
     content: string;
+    imageUrls: string[];
 };
 
-export default function EditPostButton({ postId, content }: Props) {
+export default function EditPostButton({ postId, content, imageUrls }: Props) {
     const openEdit = useOpenEditPostModal();
 
     return (
@@ -15,7 +16,7 @@ export default function EditPostButton({ postId, content }: Props) {
             variant="ghost"
             size="icon-sm"
             className="text-muted-foreground"
-            onClick={() => openEdit({ postId, content })}
+            onClick={() => openEdit({ postId, content, imageUrls })}
         >
             <PencilIcon className="h-4 w-4" />
         </Button>

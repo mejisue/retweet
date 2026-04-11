@@ -11,6 +11,7 @@ type EditMode = {
     type: 'EDIT';
     postId: number;
     content: string;
+    imageUrls: string[];
 };
 
 type CloseState = {

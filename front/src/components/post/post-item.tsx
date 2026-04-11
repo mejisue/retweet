@@ -42,7 +42,7 @@ export default function PostItem({ postId, type }: Props) {
 
                 {isMine && (
                     <div className="flex text-muted-foreground">
-                        <EditPostButton postId={post.id} content={post.content} />
+                        <EditPostButton postId={post.id} content={post.content} imageUrls={post.imageUrls} />
                         <DeletePostButton
                             postId={post.id}
                             onDeleted={type === 'DETAIL' ? () => navigate('/') : undefined}

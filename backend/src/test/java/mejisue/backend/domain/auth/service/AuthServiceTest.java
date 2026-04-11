@@ -11,6 +11,7 @@ import mejisue.backend.domain.auth.entity.PasswordResetToken;
 import mejisue.backend.domain.auth.repository.PasswordResetTokenRepository;
 import mejisue.backend.domain.member.entity.Member;
 import mejisue.backend.domain.member.repository.MemberRepository;
+import mejisue.backend.domain.profile.entity.Profile;
 import mejisue.backend.domain.profile.repository.ProfileRepository;
 import mejisue.backend.infra.email.EmailService;
 import mejisue.backend.infra.github.GithubOAuthClient;
@@ -34,6 +35,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
@@ -149,6 +151,7 @@ class AuthServiceTest {
         given(githubOAuthClient.getUserInfo("github-token")).willReturn(userInfo);
         given(memberRepository.findByGithubId("99")).willReturn(Optional.empty());
         given(memberRepository.save(any())).willReturn(newMember);
+        given(profileRepository.findByMemberId(any())).willReturn(Optional.of(mock(Profile.class)));
         given(jwtService.generateAccessToken(any())).willReturn("access-token");
         given(refreshTokenStore.save(any())).willReturn("refresh-token");
 
@@ -168,6 +171,7 @@ class AuthServiceTest {
         given(githubOAuthClient.getAccessToken("code123")).willReturn("github-token");
         given(githubOAuthClient.getUserInfo("github-token")).willReturn(userInfo);
         given(memberRepository.findByGithubId("99")).willReturn(Optional.of(existingMember));
+        given(profileRepository.findByMemberId(any())).willReturn(Optional.of(mock(Profile.class)));
         given(jwtService.generateAccessToken(any())).willReturn("access-token");
         given(refreshTokenStore.save(any())).willReturn("refresh-token");
 

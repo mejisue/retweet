@@ -12,6 +12,7 @@ import mejisue.backend.domain.post.entity.Post;
 import mejisue.backend.domain.post.repository.PostRepository;
 import mejisue.backend.domain.profile.entity.Profile;
 import mejisue.backend.domain.profile.repository.ProfileRepository;
+import mejisue.backend.infra.s3.S3Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,7 @@ class PostServiceTest {
     @Mock PostRepository postRepository;
     @Mock ProfileRepository profileRepository;
     @Mock PostLikeRepository postLikeRepository;
+    @Mock S3Service s3Service;
 
     @InjectMocks PostService postService;
 
@@ -187,12 +189,30 @@ class PostServiceTest {
     // ────────────────────────────────────────────
 
     @Test
-    @DisplayName("게시글 삭제 성공")
-    void delete_success() {
+    @DisplayName("이미지 없는 게시글 삭제 → S3 호출 없이 DB 삭제")
+    void delete_noImages_success() {
         given(postRepository.findById(1L)).willReturn(Optional.of(post));
+        given(post.getImageUrls()).willReturn(List.of());
 
         postService.delete(1L, member);
 
+        then(s3Service).shouldHaveNoInteractions();
+        then(postRepository).should().delete(post);
+    }
+
+    @Test
+    @DisplayName("이미지 있는 게시글 삭제 → S3 삭제 후 DB 삭제")
+    void delete_withImages_deletesS3First() {
+        List<String> imageUrls = List.of(
+                "https://cdn.cloudfront.net/posts/1/a.jpg",
+                "https://cdn.cloudfront.net/posts/1/b.png"
+        );
+        given(postRepository.findById(1L)).willReturn(Optional.of(post));
+        given(post.getImageUrls()).willReturn(imageUrls);
+
+        postService.delete(1L, member);
+
+        then(s3Service).should().deleteAll(imageUrls);
         then(postRepository).should().delete(post);
     }
 

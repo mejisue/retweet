@@ -1,7 +1,9 @@
 import apiClient from './client';
 import type { Post, PageSlice } from '@/types';
+import { uploadImages } from './image';
 
-export async function createPost({ content, imageUrls }: { content: string; imageUrls: string[] }): Promise<Post> {
+export async function createPostWithImages({ content, images }: { content: string; images: File[] }): Promise<Post> {
+    const imageUrls = images.length > 0 ? await uploadImages(images) : [];
     const { data } = await apiClient.post('/api/posts', { content, imageUrls });
     return data;
 }
