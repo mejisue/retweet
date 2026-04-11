@@ -79,6 +79,11 @@ public class AuthService {
                     return newMember;
                 });
 
+        // 기존 회원인데 프로필이 없는 경우 보완 생성 (데이터 불일치 방어)
+        profileRepository.findByMemberId(member.getId())
+                .orElseGet(() -> profileRepository.save(
+                        Profile.of(member, userInfo.login(), userInfo.avatarUrl())));
+
         return generateTokens(member);
     }
 
