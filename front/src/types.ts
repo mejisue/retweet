@@ -32,6 +32,22 @@ export type Post = {
     updatedAt: string;
 };
 
+export type Comment = {
+    id: number;
+    postId: number;
+    content: string;
+    author: AuthorInfo;
+    parentCommentId: number | null;
+    rootCommentId: number | null;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type NestedComment = Comment & {
+    parentComment?: Comment;
+    children: NestedComment[];
+};
+
 export type PageSlice<T> = {
     content: T[];
     hasNext: boolean;

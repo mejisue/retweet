@@ -4,7 +4,9 @@ import EditPostButton from '@/components/post/edit-post-button';
 import LikePostButton from '@/components/post/like-post-button';
 import { usePost } from '@/hooks/queries/post/use-post';
 import { formatTimeAgo } from '@/lib/time';
+import { useOpenCommentEditorModal } from '@/store/comment-editor-modal';
 import { useSession } from '@/store/session';
+import { MessageCircleIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 type Props = {
@@ -15,6 +17,7 @@ type Props = {
 export default function PostItem({ postId, type }: Props) {
     const navigate = useNavigate();
     const session = useSession();
+    const openCommentEditor = useOpenCommentEditorModal();
     const { data: post, isPending, error } = usePost(postId);
 
     if (isPending) return <div className="h-32 animate-pulse rounded-xl bg-muted" />;
@@ -69,9 +72,18 @@ export default function PostItem({ postId, type }: Props) {
                 </div>
             )}
 
-            {/* 좋아요 */}
+            {/* 좋아요 / 댓글 */}
             <div className="flex gap-2">
                 <LikePostButton postId={post.id} likeCount={post.likeCount} />
+                {type === 'FEED' && (
+                    <button
+                        onClick={() => openCommentEditor(post.id)}
+                        className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl border p-2 px-4 text-sm"
+                    >
+                        <MessageCircleIcon className="h-4 w-4" />
+                        <span>댓글 달기</span>
+                    </button>
+                )}
             </div>
         </div>
     );
