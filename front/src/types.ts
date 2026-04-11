@@ -1,3 +1,5 @@
+export type Theme = "light" | "dark";
+
 export type Member = {
     memberId: number;
     email: string | null;
