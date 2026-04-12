@@ -51,10 +51,10 @@ app:
 cloud:
   aws:
     credentials:
-      access-key: ${AWS_ACCESS_KEY:test-access-key}
-      secret-key: ${AWS_SECRET_KEY:test-secret-key}
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
     region: ${AWS_REGION:ap-northeast-2}
     s3:
-      bucket: ${AWS_S3_BUCKET:test-bucket}
+      bucket: ${AWS_S3_BUCKET}
     cloudfront:
-      domain: ${AWS_CLOUDFRONT_DOMAIN:test.cloudfront.net}
+      domain: ${AWS_CLOUDFRONT_DOMAIN}
