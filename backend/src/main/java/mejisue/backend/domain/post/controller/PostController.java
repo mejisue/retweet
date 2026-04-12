@@ -42,20 +42,24 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<Slice<PostResponse>> getAll(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(postService.findAll(pageable));
+        return ResponseEntity.ok(postService.findAll(userDetails.getMember().getId(), pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(postService.findById(id));
+    public ResponseEntity<PostResponse> getById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(postService.findById(id, userDetails.getMember().getId()));
     }
 
     @GetMapping("/member/{memberId}")
     public ResponseEntity<Slice<PostResponse>> getByMember(
             @PathVariable Long memberId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(postService.findByMemberId(memberId, pageable));
+        return ResponseEntity.ok(postService.findByMemberId(memberId, userDetails.getMember().getId(), pageable));
     }
 
     @PutMapping("/{id}")

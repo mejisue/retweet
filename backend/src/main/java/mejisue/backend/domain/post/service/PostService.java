@@ -32,33 +32,37 @@ public class PostService {
     public PostResponse create(Member member, PostCreateRequest request) {
         Post post = postRepository.save(Post.create(member, request.content(), request.imageUrls()));
         Profile profile = getProfile(member.getId());
-        return PostResponse.of(post, profile);
+        return PostResponse.of(post, profile, false);
     }
 
     @Transactional(readOnly = true)
-    public PostResponse findById(Long postId) {
+    public PostResponse findById(Long postId, Long memberId) {
         Post post = getPost(postId);
         Profile profile = getProfile(post.getMember().getId());
-        return PostResponse.of(post, profile);
+        boolean isLiked = postLikeRepository.existsByMemberIdAndPostId(memberId, postId);
+        return PostResponse.of(post, profile, isLiked);
     }
 
     @Transactional(readOnly = true)
-    public Slice<PostResponse> findAll(Pageable pageable) {
+    public Slice<PostResponse> findAll(Long memberId, Pageable pageable) {
         return postRepository.findAllByOrderByCreatedAtDesc(pageable)
-                .map(post -> PostResponse.of(post, getProfile(post.getMember().getId())));
+                .map(post -> PostResponse.of(post, getProfile(post.getMember().getId()),
+                        postLikeRepository.existsByMemberIdAndPostId(memberId, post.getId())));
     }
 
     @Transactional(readOnly = true)
-    public Slice<PostResponse> findByMemberId(Long memberId, Pageable pageable) {
+    public Slice<PostResponse> findByMemberId(Long memberId, Long requesterId, Pageable pageable) {
         Profile profile = getProfile(memberId);
         return postRepository.findAllByMemberIdOrderByCreatedAtDesc(memberId, pageable)
-                .map(post -> PostResponse.of(post, profile));
+                .map(post -> PostResponse.of(post, profile,
+                        postLikeRepository.existsByMemberIdAndPostId(requesterId, post.getId())));
     }
 
     public PostResponse update(Long postId, Member member, PostUpdateRequest request) {
         Post post = getOwnedPost(postId, member.getId());
         post.update(request.content(), request.imageUrls());
-        return PostResponse.of(post, getProfile(member.getId()));
+        boolean isLiked = postLikeRepository.existsByMemberIdAndPostId(member.getId(), postId);
+        return PostResponse.of(post, getProfile(member.getId()), isLiked);
     }
 
     public void delete(Long postId, Member member) {
