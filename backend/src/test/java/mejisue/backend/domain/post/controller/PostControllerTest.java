@@ -69,7 +69,7 @@ class PostControllerTest {
 
     private PostResponse mockPostResponse() {
         return new PostResponse(
-                1L, "테스트 내용", List.of(), 0,
+                1L, "테스트 내용", List.of(), 0, false,
                 new PostResponse.AuthorInfo(1L, "닉네임", null),
                 LocalDateTime.now(), LocalDateTime.now()
         );
@@ -113,12 +113,13 @@ class PostControllerTest {
     @Test
     @DisplayName("GET /api/posts → 200, 게시글 목록")
     void getAll_returns200() throws Exception {
-        given(postService.findAll(any())).willReturn(new SliceImpl<>(List.of(mockPostResponse())));
+        given(postService.findAll(any(), any())).willReturn(new SliceImpl<>(List.of(mockPostResponse())));
 
         mockMvc.perform(get("/api/posts").with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(1))
-                .andExpect(jsonPath("$.content[0].content").value("테스트 내용"));
+                .andExpect(jsonPath("$.content[0].content").value("테스트 내용"))
+                .andExpect(jsonPath("$.content[0].isLiked").value(false));
     }
 
     // ────────────────────────────────────────────
@@ -128,12 +129,13 @@ class PostControllerTest {
     @Test
     @DisplayName("GET /api/posts/{id} → 200, 단건 조회")
     void getById_returns200() throws Exception {
-        given(postService.findById(1L)).willReturn(mockPostResponse());
+        given(postService.findById(eq(1L), any())).willReturn(mockPostResponse());
 
         mockMvc.perform(get("/api/posts/1").with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.content").value("테스트 내용"));
+                .andExpect(jsonPath("$.content").value("테스트 내용"))
+                .andExpect(jsonPath("$.isLiked").value(false));
     }
 
     // ────────────────────────────────────────────
@@ -143,11 +145,12 @@ class PostControllerTest {
     @Test
     @DisplayName("GET /api/posts/member/{memberId} → 200, 회원별 게시글 목록")
     void getByMember_returns200() throws Exception {
-        given(postService.findByMemberId(eq(1L), any())).willReturn(new SliceImpl<>(List.of(mockPostResponse())));
+        given(postService.findByMemberId(eq(1L), any(), any())).willReturn(new SliceImpl<>(List.of(mockPostResponse())));
 
         mockMvc.perform(get("/api/posts/member/1").with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].id").value(1));
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].isLiked").value(false));
     }
 
     // ────────────────────────────────────────────
@@ -158,7 +161,7 @@ class PostControllerTest {
     @DisplayName("PUT /api/posts/{id} → 200, 게시글 수정")
     void update_returns200() throws Exception {
         PostResponse updated = new PostResponse(
-                1L, "수정된 내용", List.of(), 0,
+                1L, "수정된 내용", List.of(), 0, false,
                 new PostResponse.AuthorInfo(1L, "닉네임", null),
                 LocalDateTime.now(), LocalDateTime.now()
         );

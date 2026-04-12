@@ -11,6 +11,7 @@ public record PostResponse(
         String content,
         List<String> imageUrls,
         int likeCount,
+        boolean isLiked,
         AuthorInfo author,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
@@ -18,12 +19,13 @@ public record PostResponse(
     public record AuthorInfo(Long memberId, String nickname, String avatarUrl) {
     }
 
-    public static PostResponse of(Post post, Profile profile) {
+    public static PostResponse of(Post post, Profile profile, boolean isLiked) {
         return new PostResponse(
                 post.getId(),
                 post.getContent(),
                 post.getImageUrls(),
                 post.getLikeCount(),
+                isLiked,
                 new AuthorInfo(
                         post.getMember().getId(),
                         profile.getNickname(),
