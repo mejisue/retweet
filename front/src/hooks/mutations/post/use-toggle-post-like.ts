@@ -17,7 +17,8 @@ export function useTogglePostLike(postId: number, callbacks?: UseMutationCallbac
                 if (!post) return post;
                 return {
                     ...post,
-                    likeCount: post.likeCount + 1, // 서버 응답으로 갱신되므로 임시값
+                    isLiked: !post.isLiked,
+                    likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1,
                 };
             });
 

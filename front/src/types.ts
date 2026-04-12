@@ -29,6 +29,7 @@ export type Post = {
     content: string;
     imageUrls: string[];
     likeCount: number;
+    isLiked: boolean;
     author: AuthorInfo;
     createdAt: string;
     updatedAt: string;

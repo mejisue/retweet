@@ -76,7 +76,7 @@ export default function PostItem({ postId, type }: Props) {
 
             {/* 좋아요 / 댓글 */}
             <div className="flex gap-2">
-                <LikePostButton postId={post.id} likeCount={post.likeCount} />
+                <LikePostButton postId={post.id} likeCount={post.likeCount} isLiked={post.isLiked} />
                 {type === 'FEED' && (
                     <button
                         onClick={() => openCommentEditor(post.id)}
