@@ -97,15 +97,29 @@ class PostServiceTest {
     // ────────────────────────────────────────────
 
     @Test
-    @DisplayName("게시글 단건 조회 성공")
-    void findById_success() {
+    @DisplayName("게시글 단건 조회 성공 - 좋아요 안 한 경우 isLiked=false")
+    void findById_success_notLiked() {
         given(postRepository.findById(1L)).willReturn(Optional.of(post));
         given(profileRepository.findByMemberId(1L)).willReturn(Optional.of(profile));
+        given(postLikeRepository.existsByMemberIdAndPostId(1L, 1L)).willReturn(false);
 
-        PostResponse result = postService.findById(1L);
+        PostResponse result = postService.findById(1L, 1L);
 
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.content()).isEqualTo("테스트 내용");
+        assertThat(result.isLiked()).isFalse();
+    }
+
+    @Test
+    @DisplayName("게시글 단건 조회 성공 - 좋아요 한 경우 isLiked=true")
+    void findById_success_liked() {
+        given(postRepository.findById(1L)).willReturn(Optional.of(post));
+        given(profileRepository.findByMemberId(1L)).willReturn(Optional.of(profile));
+        given(postLikeRepository.existsByMemberIdAndPostId(1L, 1L)).willReturn(true);
+
+        PostResponse result = postService.findById(1L, 1L);
+
+        assertThat(result.isLiked()).isTrue();
     }
 
     @Test
@@ -113,7 +127,7 @@ class PostServiceTest {
     void findById_notFound() {
         given(postRepository.findById(999L)).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> postService.findById(999L))
+        assertThatThrownBy(() -> postService.findById(999L, 1L))
                 .isInstanceOf(BusinessException.class)
                 .extracting(e -> ((BusinessException) e).getErrorCode())
                 .isEqualTo(ErrorCode.POST_NOT_FOUND);
@@ -130,8 +144,9 @@ class PostServiceTest {
 
         given(postRepository.findAllByOrderByCreatedAtDesc(any())).willReturn(postSlice);
         given(profileRepository.findByMemberId(1L)).willReturn(Optional.of(profile));
+        given(postLikeRepository.existsByMemberIdAndPostId(1L, 1L)).willReturn(false);
 
-        Slice<PostResponse> result = postService.findAll(PageRequest.of(0, 10));
+        Slice<PostResponse> result = postService.findAll(1L, PageRequest.of(0, 10));
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).content()).isEqualTo("테스트 내용");
@@ -144,8 +159,9 @@ class PostServiceTest {
 
         given(postRepository.findAllByMemberIdOrderByCreatedAtDesc(1L, PageRequest.of(0, 10))).willReturn(postSlice);
         given(profileRepository.findByMemberId(1L)).willReturn(Optional.of(profile));
+        given(postLikeRepository.existsByMemberIdAndPostId(1L, 1L)).willReturn(false);
 
-        Slice<PostResponse> result = postService.findByMemberId(1L, PageRequest.of(0, 10));
+        Slice<PostResponse> result = postService.findByMemberId(1L, 1L, PageRequest.of(0, 10));
 
         assertThat(result.getContent()).hasSize(1);
     }
@@ -161,6 +177,7 @@ class PostServiceTest {
 
         given(postRepository.findById(1L)).willReturn(Optional.of(post));
         given(profileRepository.findByMemberId(1L)).willReturn(Optional.of(profile));
+        given(postLikeRepository.existsByMemberIdAndPostId(1L, 1L)).willReturn(false);
 
         PostResponse result = postService.update(1L, member, request);
 
