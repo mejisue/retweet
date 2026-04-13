@@ -2,8 +2,11 @@ import { Outlet, Link } from "react-router-dom";
 import cat from "@/assets/cat.png";
 import ProfileButton from "@/components/layout/profile-button";
 import ThemeButton from "@/components/layout/theme-button";
+import { useSession } from "@/store/session";
 
 export default function GlobalLayout() {
+    const session = useSession();
+
     return (
         <div className="min-h-[100vh] flex flex-col">
             <header className="h-15 border-b">
@@ -16,7 +19,7 @@ export default function GlobalLayout() {
                     </Link>
                     <div className="flex items-center gap-5">
                         <ThemeButton />
-                        <ProfileButton />
+                        {session && <ProfileButton />}
                     </div>
                 </div>
             </header>
