@@ -2,6 +2,7 @@ package mejisue.backend.domain.post.service;
 
 import mejisue.backend.common.exception.BusinessException;
 import mejisue.backend.common.exception.ErrorCode;
+import mejisue.backend.domain.comment.repository.CommentRepository;
 import mejisue.backend.domain.like.entity.PostLike;
 import mejisue.backend.domain.like.repository.PostLikeRepository;
 import mejisue.backend.domain.member.entity.Member;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 
@@ -45,6 +48,7 @@ class PostServiceTest {
     @Mock PostRepository postRepository;
     @Mock ProfileRepository profileRepository;
     @Mock PostLikeRepository postLikeRepository;
+    @Mock CommentRepository commentRepository;
     @Mock S3Service s3Service;
 
     @InjectMocks PostService postService;
@@ -206,7 +210,7 @@ class PostServiceTest {
     // ────────────────────────────────────────────
 
     @Test
-    @DisplayName("이미지 없는 게시글 삭제 → S3 호출 없이 DB 삭제")
+    @DisplayName("이미지 없는 게시글 삭제 → S3 호출 없이 댓글·좋아요·게시글 순서대로 삭제")
     void delete_noImages_success() {
         given(postRepository.findById(1L)).willReturn(Optional.of(post));
         given(post.getImageUrls()).willReturn(List.of());
@@ -214,11 +218,15 @@ class PostServiceTest {
         postService.delete(1L, member);
 
         then(s3Service).shouldHaveNoInteractions();
-        then(postRepository).should().delete(post);
+        InOrder order = inOrder(commentRepository, postLikeRepository, postRepository);
+        order.verify(commentRepository).clearSelfReferencesByPostId(1L);
+        order.verify(commentRepository).deleteAllByPostId(1L);
+        order.verify(postLikeRepository).deleteAllByPostId(1L);
+        order.verify(postRepository).delete(post);
     }
 
     @Test
-    @DisplayName("이미지 있는 게시글 삭제 → S3 삭제 후 DB 삭제")
+    @DisplayName("이미지 있는 게시글 삭제 → S3 삭제 후 댓글·좋아요·게시글 순서대로 삭제")
     void delete_withImages_deletesS3First() {
         List<String> imageUrls = List.of(
                 "https://cdn.cloudfront.net/posts/1/a.jpg",
@@ -229,12 +237,29 @@ class PostServiceTest {
 
         postService.delete(1L, member);
 
-        then(s3Service).should().deleteAll(imageUrls);
-        then(postRepository).should().delete(post);
+        InOrder order = inOrder(s3Service, commentRepository, postLikeRepository, postRepository);
+        order.verify(s3Service).deleteAll(imageUrls);
+        order.verify(commentRepository).clearSelfReferencesByPostId(1L);
+        order.verify(commentRepository).deleteAllByPostId(1L);
+        order.verify(postLikeRepository).deleteAllByPostId(1L);
+        order.verify(postRepository).delete(post);
     }
 
     @Test
-    @DisplayName("다른 사람의 게시글 삭제 → FORBIDDEN 예외")
+    @DisplayName("댓글 삭제 시 자기 참조 FK 제거 후 전체 삭제 순서 보장")
+    void delete_commentsDeletedInCorrectOrder() {
+        given(postRepository.findById(1L)).willReturn(Optional.of(post));
+        given(post.getImageUrls()).willReturn(List.of());
+
+        postService.delete(1L, member);
+
+        InOrder order = inOrder(commentRepository);
+        order.verify(commentRepository).clearSelfReferencesByPostId(1L);
+        order.verify(commentRepository).deleteAllByPostId(1L);
+    }
+
+    @Test
+    @DisplayName("다른 사람의 게시글 삭제 → FORBIDDEN 예외, 댓글·좋아요·게시글 삭제 미호출")
     void delete_forbidden() {
         Member other = Member.ofLocal("other@example.com", "encoded");
         setField(other, "id", 2L);
@@ -246,6 +271,8 @@ class PostServiceTest {
                 .extracting(e -> ((BusinessException) e).getErrorCode())
                 .isEqualTo(ErrorCode.FORBIDDEN);
 
+        then(commentRepository).shouldHaveNoInteractions();
+        then(postLikeRepository).shouldHaveNoInteractions();
         then(postRepository).should(never()).delete(any(Post.class));
     }
 

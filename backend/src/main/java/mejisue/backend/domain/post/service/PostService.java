@@ -3,6 +3,7 @@ package mejisue.backend.domain.post.service;
 import lombok.RequiredArgsConstructor;
 import mejisue.backend.common.exception.BusinessException;
 import mejisue.backend.common.exception.ErrorCode;
+import mejisue.backend.domain.comment.repository.CommentRepository;
 import mejisue.backend.domain.like.entity.PostLike;
 import mejisue.backend.domain.like.repository.PostLikeRepository;
 import mejisue.backend.domain.member.entity.Member;
@@ -27,6 +28,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final ProfileRepository profileRepository;
     private final PostLikeRepository postLikeRepository;
+    private final CommentRepository commentRepository;
     private final S3Service s3Service;
 
     public PostResponse create(Member member, PostCreateRequest request) {
@@ -70,6 +72,9 @@ public class PostService {
         if (!post.getImageUrls().isEmpty()) {
             s3Service.deleteAll(post.getImageUrls());
         }
+        commentRepository.clearSelfReferencesByPostId(postId);
+        commentRepository.deleteAllByPostId(postId);
+        postLikeRepository.deleteAllByPostId(postId);
         postRepository.delete(post);
     }
 
