@@ -22,7 +22,7 @@ services:
       - redis_data:/data
 
   app:
-    build: .
+    image: ghcr.io/mejisue/threaleact-backend:latest
     restart: always
     ports:
       - "8080:8080"
