@@ -27,25 +27,5 @@ jobs:
 
             git pull origin main
 
-            cat > .env <<EOF
-            DB_NAME=${{ secrets.DB_NAME }}
-            DB_USERNAME=${{ secrets.DB_USERNAME }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            GITHUB_CLIENT_ID=${{ secrets.GITHUB_CLIENT_ID }}
-            GITHUB_CLIENT_SECRET=${{ secrets.GITHUB_CLIENT_SECRET }}
-            MAIL_HOST=${{ secrets.MAIL_HOST }}
-            MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
-            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
-            MAIL_FROM=${{ secrets.MAIL_FROM }}
-            FRONTEND_URL=${{ secrets.FRONTEND_URL }}
-            AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
-            AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
-            AWS_REGION=${{ secrets.AWS_REGION }}
-            AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}
-            AWS_CLOUDFRONT_DOMAIN=${{ secrets.AWS_CLOUDFRONT_DOMAIN }}
-            EOF
-
             docker compose -f docker-compose.prod.yml up -d --build
             docker image prune -f
