@@ -20,7 +20,7 @@ type CloseState = {
 
 type State = CreateMode | EditMode | CloseState;
 
-const initialState: State = { isOpen: false };
+const initialState: State = { isOpen: false } as State;
 
 const usePostEditorModalStore = create(
     devtools(
