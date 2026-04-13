@@ -12,7 +12,7 @@ type CloseState = {
 
 type State = OpenState | CloseState;
 
-const initialState: State = { isOpen: false };
+const initialState: State = { isOpen: false } as State;
 
 const useCommentEditorModalStore = create(
     devtools(
