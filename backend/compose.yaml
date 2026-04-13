@@ -1,10 +1,20 @@
 services:
   mysql:
-    image: 'mysql:latest'
+    image: mysql:8.0
     environment:
-      - 'MYSQL_DATABASE=mydatabase'
-      - 'MYSQL_PASSWORD=secret'
-      - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=myuser'
+      MYSQL_DATABASE: threaleact
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: threaleact
+      MYSQL_PASSWORD: password
     ports:
-      - '3306'
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+
+volumes:
+  mysql_data:
