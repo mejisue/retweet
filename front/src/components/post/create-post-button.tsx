@@ -1,14 +1,16 @@
-import { Button } from '@/components/ui/button';
 import { useOpenCreatePostModal } from '@/store/post-editor-modal';
-import { PlusIcon } from 'lucide-react';
+import { PlusCircleIcon } from 'lucide-react';
 
 export default function CreatePostButton() {
     const openCreate = useOpenCreatePostModal();
 
     return (
-        <Button className="w-full" variant="outline" onClick={openCreate}>
-            <PlusIcon className="h-4 w-4" />
-            포스트 작성
-        </Button>
+        <button
+            className="w-full flex items-center justify-between px-5 py-4 rounded-xl bg-muted text-muted-foreground hover:bg-muted/70 transition-colors cursor-pointer"
+            onClick={openCreate}
+        >
+            <span>나누고 싶은 이야기가 있나요?</span>
+            <PlusCircleIcon className="h-6 w-6 shrink-0" />
+        </button>
     );
 }
