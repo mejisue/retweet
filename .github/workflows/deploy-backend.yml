@@ -1,4 +1,4 @@
-name: Deploy Backend to Lightsail
+name: Deploy Backend to EC2
 
 on:
   push:
@@ -6,42 +6,66 @@ on:
       - main
 
 env:
-  IMAGE: ghcr.io/mejisue/threaleact-backend
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/retweet-backend
 
 jobs:
-  build-and-deploy:
+  build-and-push:
+    name: Build & Push Docker Image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Login to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build and push image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v5
         with:
           context: ./backend
           push: true
-          tags: ${{ env.IMAGE }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Deploy to Lightsail via SSH
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.LIGHTSAIL_HOST }}
-          username: ${{ secrets.LIGHTSAIL_USER }}
-          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u mejisue --password-stdin
+            # GHCR 로그인
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            cd ~/threaleact/backend
-            git pull origin main
+            cd ~/retweet
 
-            docker compose -f docker-compose.prod.yml pull app
-            docker compose -f docker-compose.prod.yml up -d
+            # 최신 이미지 pull
+            docker compose --env-file .env.prod -f compose.prod.yaml pull app
+
+            # 재시작 (redis는 유지)
+            docker compose --env-file .env.prod -f compose.prod.yaml up -d --no-deps app
+
+            # 오래된 이미지 정리
             docker image prune -f
