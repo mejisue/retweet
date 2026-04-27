@@ -63,6 +63,9 @@ jobs:
 
             cd ~/retweet
 
+            # compose 파일 등 EC2 설정 동기화
+            git pull origin main
+
             # 최신 이미지 pull
             docker compose --env-file .env.prod -f compose.prod.yaml pull app
 
