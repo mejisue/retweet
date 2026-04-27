@@ -37,6 +37,7 @@ jobs:
           context: ./backend
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          platforms: linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
