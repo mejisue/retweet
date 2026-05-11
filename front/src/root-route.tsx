@@ -1,18 +1,21 @@
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import GlobalLayout from '@/components/layout/global-layout';
 import GuestOnlyLayout from '@/components/layout/guest-only-layout';
 import MemberOnlyLayout from '@/components/layout/member-only-layout';
-import IndexPage from './pages/index-page';
-import SignInPage from './pages/sign-in-page';
-import SignUpPage from './pages/sign-up-page';
-import ForgetPasswordPage from './pages/forget-password-page';
-import ResetPasswordPage from './pages/reset-password-page';
-import PostDetailPage from './pages/post-detail-page';
-import ProfileDetailPage from './pages/profile-detail-page';
-import GithubCallbackPage from './pages/github-callback-page';
+
+const IndexPage = lazy(() => import('./pages/index-page'));
+const SignInPage = lazy(() => import('./pages/sign-in-page'));
+const SignUpPage = lazy(() => import('./pages/sign-up-page'));
+const ForgetPasswordPage = lazy(() => import('./pages/forget-password-page'));
+const ResetPasswordPage = lazy(() => import('./pages/reset-password-page'));
+const PostDetailPage = lazy(() => import('./pages/post-detail-page'));
+const ProfileDetailPage = lazy(() => import('./pages/profile-detail-page'));
+const GithubCallbackPage = lazy(() => import('./pages/github-callback-page'));
 
 export default function RootRoute() {
     return (
+        <Suspense fallback={null}>
         <Routes>
             {/* GitHub OAuth 콜백 (레이아웃 없이 독립 처리) */}
             <Route path="/auth/github/callback" element={<GithubCallbackPage />} />
@@ -34,5 +37,6 @@ export default function RootRoute() {
                 <Route path="*" element={<Navigate to="/" />} />
             </Route>
         </Routes>
+        </Suspense>
     );
 }
