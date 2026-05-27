@@ -15,7 +15,7 @@ export default function LikePostButton({ postId, likeCount, isLiked }: Props) {
 
     return (
         <button
-            onClick={toggleLike}
+            onClick={() => toggleLike()}
             disabled={isPending}
             className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl border p-2 px-4 text-sm disabled:opacity-50"
         >
