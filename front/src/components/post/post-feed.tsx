@@ -68,7 +68,6 @@ function VirtualFeed({ postIds, isFetchingNextPage, bottomRef }: VirtualFeedProp
         // 피드 컨테이너의 페이지 상단 기준 y 오프셋.
         // virtualizer가 "지금 화면에 보이는 아이템"을 계산할 때
         // 피드가 y:0 에서 시작하지 않는다는 걸 알려줘야 합니다.
-        // eslint-disable-next-line react-hooks/refs
         scrollMargin: listRef.current?.offsetTop ?? 0,
     });
 
