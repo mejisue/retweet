@@ -1,0 +1,45 @@
+name: CI Frontend
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '10'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: front/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: front
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        working-directory: front
+        run: pnpm lint
+
+      - name: Type check
+        working-directory: front
+        run: pnpm typecheck
+
+      # 빌드는 Vercel이 담당 — 환경변수를 GitHub Secrets에 따로 등록할 필요 없음
