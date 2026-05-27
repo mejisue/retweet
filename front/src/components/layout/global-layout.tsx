@@ -2,10 +2,11 @@ import { Outlet, Link } from "react-router-dom";
 import cat from "@/assets/cat.png";
 import ProfileButton from "@/components/layout/profile-button";
 import ThemeButton from "@/components/layout/theme-button";
-import { useSession } from "@/store/session";
+import { useSession, useIsSessionLoaded } from "@/store/session";
 
 export default function GlobalLayout() {
     const session = useSession();
+    const isSessionLoaded = useIsSessionLoaded();
 
     return (
         <div className="min-h-[100vh] flex flex-col">
@@ -19,7 +20,9 @@ export default function GlobalLayout() {
                     </Link>
                     <div className="flex items-center gap-5">
                         <ThemeButton />
-                        {session && <ProfileButton />}
+                        {!isSessionLoaded
+                            ? <div className="h-8 w-8 rounded-full bg-muted" />
+                            : session && <ProfileButton />}
                     </div>
                 </div>
             </header>
