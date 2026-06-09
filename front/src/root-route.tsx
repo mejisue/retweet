@@ -1,5 +1,8 @@
+import * as Sentry from '@sentry/react';
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+
+const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
 import GlobalLayout from '@/components/layout/global-layout';
 import GuestOnlyLayout from '@/components/layout/guest-only-layout';
 import MemberOnlyLayout from '@/components/layout/member-only-layout';
@@ -16,7 +19,7 @@ const GithubCallbackPage = lazy(() => import('./pages/github-callback-page'));
 export default function RootRoute() {
     return (
         <Suspense fallback={null}>
-        <Routes>
+        <SentryRoutes>
             {/* GitHub OAuth 콜백 (레이아웃 없이 독립 처리) */}
             <Route path="/auth/github/callback" element={<GithubCallbackPage />} />
 
@@ -36,7 +39,7 @@ export default function RootRoute() {
 
                 <Route path="*" element={<Navigate to="/" />} />
             </Route>
-        </Routes>
+        </SentryRoutes>
         </Suspense>
     );
 }
