@@ -58,3 +58,9 @@ cloud:
       bucket: ${AWS_S3_BUCKET}
     cloudfront:
       domain: ${AWS_CLOUDFRONT_DOMAIN}
+
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${SENTRY_ENVIRONMENT:production}
+  traces-sample-rate: 0.1
+  send-default-pii: false

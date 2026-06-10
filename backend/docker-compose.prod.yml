@@ -50,6 +50,7 @@ services:
       AWS_REGION: ${AWS_REGION}
       AWS_S3_BUCKET: ${AWS_S3_BUCKET}
       AWS_CLOUDFRONT_DOMAIN: ${AWS_CLOUDFRONT_DOMAIN}
+      SENTRY_DSN: ${SENTRY_DSN}
     depends_on:
       mysql:
         condition: service_healthy
