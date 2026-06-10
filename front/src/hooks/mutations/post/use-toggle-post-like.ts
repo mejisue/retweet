@@ -1,4 +1,5 @@
 import { togglePostLike } from '@/api/post';
+import { AMPLITUDE_EVENTS, trackEvent } from '@/lib/analytics';
 import { QUERY_KEYS } from '@/lib/constants';
 import type { Post, UseMutationCallback } from '@/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -24,10 +25,14 @@ export function useTogglePostLike(postId: number, callbacks?: UseMutationCallbac
 
             return { prevPost };
         },
-        onSuccess: () => {
+        onSuccess: (_data, _vars, context) => {
             // 서버 확정 값으로 갱신
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.post.byId(postId) });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.post.list });
+            trackEvent(AMPLITUDE_EVENTS.POST_LIKE_TOGGLED, {
+                postId,
+                isLiked: context?.prevPost ? !context.prevPost.isLiked : undefined,
+            });
             callbacks?.onSuccess?.();
         },
         onError: (error, _, context) => {

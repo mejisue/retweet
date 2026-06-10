@@ -1,4 +1,5 @@
 import './sentry';
+import './amplitude';
 import * as Sentry from '@sentry/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

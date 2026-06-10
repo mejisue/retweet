@@ -1,5 +1,6 @@
 import { authWithGithub } from '@/api/auth';
 import GlobalLoader from '@/components/global-loader';
+import { AMPLITUDE_EVENTS, identifyUser, trackEvent } from '@/lib/analytics';
 import { useSetSession } from '@/store/session';
 import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -24,6 +25,8 @@ export default function GithubCallbackPage() {
         authWithGithub(code)
             .then((session) => {
                 setSession(session);
+                identifyUser(session.member.memberId);
+                trackEvent(AMPLITUDE_EVENTS.SIGN_IN, { method: 'github' });
                 navigate('/', { replace: true });
             })
             .catch(() => {

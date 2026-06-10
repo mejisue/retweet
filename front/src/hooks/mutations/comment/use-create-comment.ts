@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createComment } from '@/api/comment';
+import { AMPLITUDE_EVENTS, trackEvent } from '@/lib/analytics';
 import { QUERY_KEYS } from '@/lib/constants';
 import type { Comment, UseMutationCallback } from '@/types';
 
@@ -14,6 +15,7 @@ export function useCreateComment(callbacks?: UseMutationCallback) {
                 QUERY_KEYS.comment.post(newComment.postId),
                 (comments) => [...(comments ?? []), newComment]
             );
+            trackEvent(AMPLITUDE_EVENTS.COMMENT_CREATED, { postId: newComment.postId });
         },
         onError: (error) => {
             callbacks?.onError?.(error);
