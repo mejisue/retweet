@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from "path"
 import { visualizer } from 'rollup-plugin-visualizer'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,6 +11,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
     visualizer({ open: true, filename: 'dist/stats.html', gzipSize: true }),
+    sentryVitePlugin({
+      org: 'mejisue',
+      project: 'retweet-frontend',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    }),
   ],
   resolve: {
     alias: {
@@ -17,6 +23,7 @@ export default defineConfig({
     },
   },
   build: {
+    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks(id) {

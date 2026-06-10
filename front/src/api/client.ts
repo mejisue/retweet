@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import axios from 'axios';
 import { getSessionStore } from '@/store/session';
 
@@ -33,6 +34,7 @@ apiClient.interceptors.response.use(
         const original = error.config;
 
         if (error.response?.status !== 401 || original._retry) {
+            Sentry.captureException(error);
             return Promise.reject(error);
         }
 
