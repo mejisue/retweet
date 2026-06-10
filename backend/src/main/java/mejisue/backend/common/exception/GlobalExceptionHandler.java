@@ -1,5 +1,6 @@
 package mejisue.backend.common.exception;
 
+import io.sentry.Sentry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -32,6 +33,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleException(Exception e) {
         log.error("Unhandled exception", e);
+        Sentry.captureException(e);
         return ResponseEntity.internalServerError().body(Map.of("message", "서버 오류가 발생했습니다."));
     }
 }
